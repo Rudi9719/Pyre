@@ -58,11 +58,15 @@ motd = """
 port_config = {}
 port_config['ssh'] = 22
 
-# Programs to be installed during update phase ONLY IF UPDATES=TRUE
-installables = ["mysql", "python3", "telnet"]
-
-
 platform = platform.system()
+# Programs to be installed during update phase ONLY IF UPDATES=TRUE
+
+if "Darwin" in platform:
+    installables = ["mysql", "python3", "telnet"]
+elif "Linux" in platform:
+    installables = ["mysql", "python3", "lightdm", "openssh-server", "gnome3"]
+
+
 
 '''
 PLEASE DO NOT EDIT BELOW THIS LINE
@@ -71,21 +75,23 @@ PLEASE DO NOT EDIT BELOW THIS LINE
 
 
 def main():
-    global motd, banner, root_pw
+    global motd, banner
     get_args()
     print(platform + " Detected.")
     print(static_ip + " Requested.")
-    add_user1()
-
     print("Banner:")
     banner = banner.format(domain)
     print(banner)
     print("Motd:")
     motd = motd.format(hostname, domain, platform, static_ip)
     print(motd)
+
+
     setup_networking()
     set_greetings()
     update_install()
+    add_user1()
+
 
 
 def setup_networking():
