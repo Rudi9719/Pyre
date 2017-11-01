@@ -22,9 +22,14 @@ domain = "nightmare.haus"
 # Workgroup
 workgroup = "NIGHTMARES"
 
-# Assign a Static IP
+# Networking
+interface = "en0"
+dhcp = True
 static_ip = "0.0.0.0"
-
+gateway = "0.0.0.0"
+netmask = "0.0.0.0"
+dns1 = "8.8.8.8"
+dns2 = "8.8.4.4"
 
 
 # The following options are specifically for *nix
@@ -76,8 +81,28 @@ def main():
     print("Motd:")
     motd = motd.format(hostname, domain, platform, static_ip)
     print(motd)
+    setup_networking()
+    add_user1()
     set_greetings()
     update_install()
+
+
+def setup_networking():
+    global dhcp
+    iface = open("/etc/network/interfaces", 'a')
+    if dhcp:
+        iface.write("auto {}".format(interface))
+        iface.write("iface {} inet dhcp".format(interface))
+    else:
+        global static_ip, gateway, dns1, dns2, netmask
+        iface.write("auto {}".format(interface))
+        iface.write("iface {} inet static".format(interface))
+        iface.write("\taddress {}".format(static_ip))
+        iface.write("\tnetmask {}".format(netmask))
+        iface.write("\tgateway {}".format(gateway))
+        iface.write("\tdns-nameservers {} {}".format(dns1, dns2))
+    os.system("/etc/init.d/networking restart")
+
 
 def add_user1():
     if "Windows" in platform:
@@ -85,13 +110,16 @@ def add_user1():
     elif "Linux" in platform:
         pass
     elif "Darwin" in platform:
-        pass
+        print("User setup isn't supported on macOS.")
+        print("Using user1's username for brewing.")
+
+
 
 def update_install():
     if (run_update):
         if "Darwin" in platform:
             print("Darwin detected, installing homebrew!")
-            os.system("/usr/bin/ruby -e \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)\"")
+            os.system("sudo -u {} /usr/bin/ruby -e \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)\"".format(user1_uname))
             for item in installables:
                 os.system("sudo -u {} brew install {}".format(user1_uname, item))
         elif "Linux" in platform:
