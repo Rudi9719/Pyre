@@ -64,7 +64,7 @@ platform = platform.system()
 if "Darwin" in platform:
     installables = ["mysql", "python3", "telnet"]
 elif "Linux" in platform:
-    installables = ["mysql", "python3", "lightdm", "openssh-server", "gnome3"]
+    installables = ["mysql", "python3", "lightdm", "openssh-server", "gnome"]
 
 
 
