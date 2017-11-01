@@ -1,4 +1,4 @@
-import sys, os, platform
+import sys, os, platform, socket
 from uuid import uuid4
 
 
@@ -71,10 +71,12 @@ PLEASE DO NOT EDIT BELOW THIS LINE
 
 
 def main():
-    global motd, banner
+    global motd, banner, root_pw
     get_args()
     print(platform + " Detected.")
     print(static_ip + " Requested.")
+    add_user1()
+
     print("Banner:")
     banner = banner.format(domain)
     print(banner)
@@ -82,38 +84,41 @@ def main():
     motd = motd.format(hostname, domain, platform, static_ip)
     print(motd)
     setup_networking()
-    add_user1()
     set_greetings()
     update_install()
 
 
 def setup_networking():
     global dhcp
-    iface = open("/etc/network/interfaces", 'a')
-    if dhcp:
-        iface.write("auto {}".format(interface))
-        iface.write("iface {} inet dhcp".format(interface))
-    else:
-        global static_ip, gateway, dns1, dns2, netmask
-        iface.write("auto {}".format(interface))
-        iface.write("iface {} inet static".format(interface))
-        iface.write("\taddress {}".format(static_ip))
-        iface.write("\tnetmask {}".format(netmask))
-        iface.write("\tgateway {}".format(gateway))
-        iface.write("\tdns-nameservers {} {}".format(dns1, dns2))
-    os.system("/etc/init.d/networking restart")
 
+    if "Linux" in platform:
+        iface = open("/etc/network/interfaces", 'a')
+        if dhcp:
+            iface.write("auto {}".format(interface))
+            iface.write("iface {} inet dhcp".format(interface))
+        else:
+            global static_ip, gateway, dns1, dns2, netmask
+            iface.write("auto {}".format(interface))
+            iface.write("iface {} inet static".format(interface))
+            iface.write("\taddress {}".format(static_ip))
+            iface.write("\tnetmask {}".format(netmask))
+            iface.write("\tgateway {}".format(gateway))
+            iface.write("\tdns-nameservers {} {}".format(dns1, dns2))
+        os.system("/etc/init.d/networking restart")
+    else:
+        pass
 
 def add_user1():
     if "Windows" in platform:
-        pass
+        os.system("net user {} {} /add".format(user1_uname, user1_pw))
     elif "Linux" in platform:
-        pass
+        os.system("useradd -m -p {} -s /bin/bash {}".format(str(uuid4()), user1_uname))
+        os.system("echo {}:{} | chpasswd".format(user1_uname, user1_pw))
+        os.system("echo root:{} | chpasswd".format(root_pw))
+        print("Generated Root Password: " + root_pw)
     elif "Darwin" in platform:
         print("User setup isn't supported on macOS.")
         print("Using user1's username for brewing.")
-
-
 
 def update_install():
     if (run_update):
@@ -126,10 +131,10 @@ def update_install():
             print("Linux detected, using APT!")
             os.system("apt update")
             for item in installables:
-                os.system("apt install " + item)
-            os.system("apt upgrade")
+                os.system("apt -y install " + item)
+            os.system("apt -y upgrade")
         elif "Windows" in platform:
-            print("Not sure how to do this..")
+            print("Does Windows have a non-interactive package manager?")
     else:
         print("Run updates was false, skipping.")
 
@@ -158,7 +163,6 @@ def set_greetings():
         if "Banner /etc/banner" in sshd_conf.read():
             print("Banner config detected!")
 
-
 def get_args():
     global hostname
     global static_ip
@@ -170,13 +174,12 @@ def get_args():
         sys.exit(0)
     elif (len(sys.argv) == 2):
         hostname = sys.argv[1]
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(('8.8.8.8', 1))
+        static_ip = s.getsockname()[0]
     elif (len(sys.argv) == 3):
         hostname = sys.argv[1]
         static_ip = sys.argv[2]
-
-
-
-
 
 
 
