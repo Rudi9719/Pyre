@@ -6,14 +6,11 @@ from uuid import uuid4
     Config Section!
 '''
 ## SHARED
-# Should updates be run?
-run_update = True
-
 # Setup the first user
-user1_uname = "gregory"
+user1_uname = "user1"
 user1_pw = str(uuid4())
-user1_fname = "Gregory"
-user1_lname = "Rudolph"
+user1_fname = "User"
+user1_lname = "One"
 
 # Hostname (PC Name on Windows)
 hostname = "nullable"
@@ -35,15 +32,17 @@ dns2 = "8.8.4.4"
 # The following options are specifically for *nix
 # Set the root PW
 root_pw = str(uuid4())
+
+
 # SSH Banner, displayed before login
 banner = """
 ###############################################################
-#                   Welcome to {}\t\t      # 
+#                   Welcome to {}.{}\t\t      # 
 #      All connections are monitored and recorded             #
 #                                                             #
 #  Disconnect IMMEDIATELY if you are not an authorized user!  #
 ###############################################################
-        """
+"""
 
 #MoTD displayed after login
 motd = """
@@ -53,16 +52,22 @@ motd = """
     
 """
 
+# Determine the running platform
+platform = platform.system()
+
 
 # Port configuration
 port_config = {}
 port_config['ssh'] = 22
 
-platform = platform.system()
-# Programs to be installed during update phase ONLY IF UPDATES=TRUE
+
+
+# Programs to be installed during update phase ONLY IF run_update = True
+run_update = True
 
 if "Darwin" in platform:
-    installables = ["mysql", "python3", "telnet"]
+    installables = ["mysql", "python3"]
+    cask = ["VirtualBox"]
 elif "Linux" in platform:
     installables = ["mysql", "python3", "lightdm", "openssh-server", "gnome"]
 
@@ -80,7 +85,7 @@ def main():
     print(platform + " Detected.")
     print(static_ip + " Requested.")
     print("Banner:")
-    banner = banner.format(domain)
+    banner = banner.format(hostname, domain)
     print(banner)
     print("Motd:")
     motd = motd.format(hostname, domain, platform, static_ip)
@@ -112,7 +117,7 @@ def setup_networking():
             iface.write("\tdns-nameservers {} {}".format(dns1, dns2))
         os.system("/etc/init.d/networking restart")
     else:
-        pass
+        print("Networking configuration not yet supported for this platform.")
 
 def add_user1():
     if "Windows" in platform:
@@ -123,9 +128,15 @@ def add_user1():
         os.system("echo root:{} | chpasswd".format(root_pw))
         print("Generated Root Password: " + root_pw)
     elif "Darwin" in platform:
-        print("User setup isn't supported on macOS.")
-        print("Using user1's username for brewing.")
-
+        user1_name = "{} {}".format(user1_fname, user1_lname)
+        os.system("sudo dscl . -create /Users/{}".format(user1_uname))
+        os.system("sudo dscl . -create /Users/{} UserShell /bin/bash".format(user1_uname))
+        os.system("sudo dscl . -create /Users/{} RealName \"{}\"".format(user1_uname, user1_name)
+        os.system("sudo dscl . -create /Users/{} UniqueID \"1010\"".format(user1_uname))
+        os.system("sudo dscl . -create /Users/{} PrimaryGroupID 80".format(user1_uname))
+        os.system("sudo dscl . -create /Users/{} NFSHomeDirectory /Users/{}".format(user1_uname, user1_uname))
+        os.system("sudo dscl . -passwd /Users/{} {}".format(user1_uname, user1_pw))
+                  
 def update_install():
     if (run_update):
         if "Darwin" in platform:
@@ -133,6 +144,8 @@ def update_install():
             os.system("sudo -u {} /usr/bin/ruby -e \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)\"".format(user1_uname))
             for item in installables:
                 os.system("sudo -u {} brew install {}".format(user1_uname, item))
+            for item in cask:
+                os.system("sudo -u {} brew cask install {}".format(user1_uname, item))
         elif "Linux" in platform:
             print("Linux detected, using APT!")
             os.system("apt update")
@@ -147,7 +160,7 @@ def update_install():
 def set_greetings():
     global motd, banner
     if "Windows" in platform:
-        pass
+        print("Windows does not natively support SSH.. SKIPPING")
     else:
         motd_f = open("/etc/motd", "w")
         motd_f.write(motd)
