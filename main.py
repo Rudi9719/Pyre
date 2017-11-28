@@ -34,7 +34,7 @@ root_pw = str(uuid4())
 # SSH Banner, displayed before login
 banner = """
 ###############################################################
-#\t          Welcome to {}.{}\t\t      # 
+#\t\tWelcome to {}.{}\t\t# 
 #      All connections are monitored and recorded             #
 #                                                             #
 #  Disconnect IMMEDIATELY if you are not an authorized user!  #
