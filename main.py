@@ -150,16 +150,14 @@ def add_user1():
         print("Generated Root Password: " + root_pw)
     elif "Darwin" in platform:
         print("User adding in Darwin is very buggy.")
-        continue = input("Continue? (y/N): ")
-        if continue:
-            user1_name = "{} {}".format(user1_fname, user1_lname)
-            os.system("sudo dscl . -create /Users/{}".format(user1_uname))
-            os.system("sudo dscl . -create /Users/{} UserShell /bin/bash".format(user1_uname))
-            os.system("sudo dscl . -create /Users/{} RealName \"{}\"".format(user1_uname, user1_name))
-            os.system("sudo dscl . -create /Users/{} UniqueID \"1010\"".format(user1_uname))
-            os.system("sudo dscl . -create /Users/{} PrimaryGroupID 80".format(user1_uname))
-            os.system("sudo dscl . -create /Users/{} NFSHomeDirectory /Users/{}".format(user1_uname, user1_uname))
-            os.system("sudo dscl . -passwd /Users/{} {}".format(user1_uname, user1_pw))
+        user1_name = "{} {}".format(user1_fname, user1_lname)
+        os.system("sudo dscl . -create /Users/{}".format(user1_uname))
+        os.system("sudo dscl . -create /Users/{} UserShell /bin/bash".format(user1_uname))
+        os.system("sudo dscl . -create /Users/{} RealName \"{}\"".format(user1_uname, user1_name))
+        os.system("sudo dscl . -create /Users/{} UniqueID \"1010\"".format(user1_uname))
+        os.system("sudo dscl . -create /Users/{} PrimaryGroupID 80".format(user1_uname))
+        os.system("sudo dscl . -create /Users/{} NFSHomeDirectory /Users/{}".format(user1_uname, user1_uname))
+        os.system("sudo dscl . -passwd /Users/{} {}".format(user1_uname, user1_pw))
 
 
 def update_install():
