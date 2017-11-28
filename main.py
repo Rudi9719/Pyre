@@ -6,10 +6,10 @@ from uuid import uuid4
 '''
 ## SHARED
 # Setup the first user
-user1_uname = "user1"
+user1_uname = "gregory"
 user1_pw = str(uuid4())
-user1_fname = "User"
-user1_lname = "One"
+user1_fname = "Gregory"
+user1_lname = "Rudolph"
 
 # Hostname (PC Name on Windows)
 hostname = "nullable"
@@ -34,7 +34,7 @@ root_pw = str(uuid4())
 # SSH Banner, displayed before login
 banner = """
 ###############################################################
-#                   Welcome to {}.{}\t\t      # 
+#\t          Welcome to {}.{}\t\t      # 
 #      All connections are monitored and recorded             #
 #                                                             #
 #  Disconnect IMMEDIATELY if you are not an authorized user!  #
@@ -149,14 +149,17 @@ def add_user1():
         os.system("echo root:{} | chpasswd".format(root_pw))
         print("Generated Root Password: " + root_pw)
     elif "Darwin" in platform:
-        user1_name = "{} {}".format(user1_fname, user1_lname)
-        os.system("sudo dscl . -create /Users/{}".format(user1_uname))
-        os.system("sudo dscl . -create /Users/{} UserShell /bin/bash".format(user1_uname))
-        os.system("sudo dscl . -create /Users/{} RealName \"{}\"".format(user1_uname, user1_name))
-        os.system("sudo dscl . -create /Users/{} UniqueID \"1010\"".format(user1_uname))
-        os.system("sudo dscl . -create /Users/{} PrimaryGroupID 80".format(user1_uname))
-        os.system("sudo dscl . -create /Users/{} NFSHomeDirectory /Users/{}".format(user1_uname, user1_uname))
-        os.system("sudo dscl . -passwd /Users/{} {}".format(user1_uname, user1_pw))
+        print("User adding in Darwin is very buggy.")
+        continue = input("Continue? (y/N): ")
+        if continue:
+            user1_name = "{} {}".format(user1_fname, user1_lname)
+            os.system("sudo dscl . -create /Users/{}".format(user1_uname))
+            os.system("sudo dscl . -create /Users/{} UserShell /bin/bash".format(user1_uname))
+            os.system("sudo dscl . -create /Users/{} RealName \"{}\"".format(user1_uname, user1_name))
+            os.system("sudo dscl . -create /Users/{} UniqueID \"1010\"".format(user1_uname))
+            os.system("sudo dscl . -create /Users/{} PrimaryGroupID 80".format(user1_uname))
+            os.system("sudo dscl . -create /Users/{} NFSHomeDirectory /Users/{}".format(user1_uname, user1_uname))
+            os.system("sudo dscl . -passwd /Users/{} {}".format(user1_uname, user1_pw))
 
 
 def update_install():
