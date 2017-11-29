@@ -7,7 +7,7 @@ from uuid import uuid4
 ## SHARED
 # Setup the first user
 user1_uname = "gregory"
-user1_pw = str(uuid4())
+user1_pw = "changeMe" 
 user1_fname = "Gregory"
 user1_lname = "Rudolph"
 
@@ -29,7 +29,7 @@ dns2 = "8.8.4.4"
 
 # The following options are specifically for *nix
 # Set the root PW
-root_pw = str(uuid4())
+root_pw = "changeMe" 
 
 # SSH Banner, displayed before login
 banner = """
