@@ -164,6 +164,7 @@ def update_install():
     if (run_update):
         if "Darwin" in platform:
             print("Darwin detected, installing homebrew!")
+            os.system("xcode-select --install")
             os.system(
                 "sudo -u {} /usr/bin/ruby -e \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)\"".format(
                     user1_uname))
