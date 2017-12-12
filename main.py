@@ -7,10 +7,11 @@ from uuid import uuid4
 ## SHARED
 # Setup the first user
 user1_uname = "gregory"
-user1_pw = "changeMe" 
+user1_pw = "changeMe"
 user1_fname = "Gregory"
 user1_lname = "Rudolph"
-
+# Add a public key to your SSH
+user1_ssh_pub = ""
 # Hostname (PC Name on Windows)
 hostname = "nullable"
 # Domain
@@ -29,12 +30,12 @@ dns2 = "8.8.4.4"
 
 # The following options are specifically for *nix
 # Set the root PW
-root_pw = "changeMe" 
+root_pw = str(uuid4()) 
 
 # SSH Banner, displayed before login
 banner = """
 ###############################################################
-#\t\tWelcome to {}.{}\t# 
+#\t\tWelcome to {}.{}\t#
 #      All connections are monitored and recorded             #
 #                                                             #
 #  Disconnect IMMEDIATELY if you are not an authorized user!  #
@@ -46,7 +47,7 @@ motd = """
     Welcome to {}.{}
     System is: {}
     IP is: {}
-    
+
 """
 
 # Determine the running platform
